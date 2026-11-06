@@ -6,10 +6,10 @@ from datetime import datetime
 #dictionary called products, which has prodcuts and their prices
 products = {
     "Cookies" : 4.0,
-    "Custard" : 4.0,
-    "Cupcake": 10.0,
+    "Custard" : 2.0,
+    "Cupcake" : 5.0,
     "Macaron" : 3.0,
-    "Strudel" : 2.0
+    "Strudel" : 4.0
 }
 
 #dictionary called shopping_list, which has products and the quantity of each
@@ -31,34 +31,36 @@ def add_product(shopping_cart, products):
         print(f"{i}. {product}")
 
     #allows the user to choose which product they'd like to add to their shopping_cart
-    product = input("Choose an available product from the list.: ")
+    product = int(input("Choose an available product from the list.: "))
 
     #verifies that the item number chosen is valid
-    while product not in products:
+    while product < 0 or product > len(products):
         #invalidates the product chosen
         print("That's not a valid product")
         #allows the user to choose which product they'd like to add to their shopping_cart
-        product = input("Choose an available product from the list.: ")
+        product = int(input("Choose an available product from the list.: "))
 
     #allows the user to choose how much of a product that they'd like to buy
-    unit = int(input(f"How much {product} would you like to add?:"))
+    unit = int(input(f"How much {list(products)[product-1]} would you like to add?:"))
 
     #verifies that the quantity of the product is valid
     while unit <= 0:
         #invalidates the number chosen
         print("That's not a valid number")
         #allows the user to choose how much of a product that they'd like to buy
-        unit = int(input(f"How much {product} would you like to add?:"))
+        unit = int(input(f"How much {list(products)[product-1]} would you like to add?:"))
     #tells the user what and how much was added to the shopping cart
-    print(f"Added {unit} {product} to your shopping cart!")
+    print(f"Added {unit} {list(products)[product-1]} to your shopping cart!")
     #checks whether or not the product was already added to the shopping cart
     if product not in shopping_cart:
-        shopping_cart[product] = unit
+        shopping_cart[list(products)[product-1]] = unit
+        print(f"{list(products)[product-1]} quantity is now {shopping_cart[list(products)[product-1]]}.")
+
     #if the product was added already, you add the amount that the user
     else:
-        shopping_cart[product] += unit
+        unit += shopping_cart[list(products)[product-1]]
     #prints the product and how much of that product is in the shopping_cart
-    print(f"{product} quantity is now {shopping_cart[product]}.")
+    print(f"{list(products)[product-1]} quantity is now {shopping_cart[list(products)[product-1]]}.")
 
 #Option 3
 def remove_product(shopping_cart):
@@ -84,17 +86,19 @@ def remove_product(shopping_cart):
 
         #checks whether or not the quantity reached 0, completely removes it from the cart
         if shopping_cart[list(shopping_cart)[remove - 1]] <= 0:
-            del shopping_cart[list(shopping_cart)[remove - 1]]
+            #list(shopping_cart)[remove - 1] is the product/key and this print statement prints that it's been removed
             print(f"{list(shopping_cart)[remove - 1]} has been completely removed from your cart.")
+            #This gets rid of a product
+            del shopping_cart[list(shopping_cart)[remove - 1]]
         #this starts when the quantity isn't 0 or less
         else:
-            print(f"{list(shopping_cart)[remove - 1]} is now {shopping_cart[list(shopping_cart)[remove - 1]]} ")
+            print(f"{list(shopping_cart)[remove - 1]} quantity is now {shopping_cart[list(shopping_cart)[remove - 1]]} ")
     #this functions when there is nothing in the shopping cart
     else:
         print("There's nothing in your shopping cart to remove.")
 
 #Option 4
-def display_cart(shopping_cart):
+def display_cart(shopping_cart,products):
     print("========== YOUR SHOPPING CART ==========")
 
     #checks whether the shopping_cart list is empty. in other words, it checks if the cart is empty
@@ -103,23 +107,39 @@ def display_cart(shopping_cart):
 
     #functions when the shopping_cart list isn't empty. in other words, it works when the cart is not empty
     else:
+        #quantity variable
+        q = 0
         #displays everything currently in the shopping cart
-        print(f"")
-        for i, (product, quantity) in enumerate(shopping_cart.items(),1):
+        for i, (product,value) in enumerate(shopping_cart.items(),1):
             #sees whether or not the key from shopping_list is in the products' dictionary
-            if list(shopping_cart)[i-1] in products:
+            if product in products:
                 #gets the unit price from the products dictionary
                 unit_price = products[list(shopping_cart)[i-1]]
-                print("Product     Unit Price     Quantity    Line Total")
-                print(f"{i}. {product}     {unit_price}     {shopping_cart[list(shopping_cart)[i - 1]]}    ${unit_price *  shopping_cart[list(shopping_cart)[i - 1]]:.2f}")
+                print("Product:")
+                print(f"{i}. {product}")
+                print("Unit Price:")
+                print(f"${unit_price:.2f}")
+                print("Quantity:")
+                print(f"{value}")
+                print("Total:")
+                print(f"${unit_price *  shopping_cart[list(shopping_cart)[i - 1]]:.2f}")
+                #gets total quntity
+                q += shopping_cart[list(shopping_cart)[i - 1]]
+        print("Total items:", q)
+
 
 #Option 5
-def calculate_total(cart, products):
-    sub = 0
+def calculate_subtotal(shopping_cart,products):
+    subtotal = 0
     #finds the subtotal by adding up all of the prices of the products
-    for itm in range(len(cart)):
-        sub += prices[products.index(cart[itm])]
-    return sub
+    #displays everything currently in the shopping cart
+    for i, (product, value) in enumerate(shopping_cart.items(),1):
+        #sees whether or not the key from shopping_list is in the products' dictionary
+        if product in products:
+            #gets the unit price from the products dictionary
+            unit_price = products[list(shopping_cart)[i-1]]
+            subtotal += (unit_price *  value)
+    return subtotal
 
 def get_discount(sub):
     #Checks whether or not the subtotal is greater than or equal to 40
@@ -136,9 +156,9 @@ def get_discount(sub):
 
 
 #Option 6
-def receipt(subtotal, cart):
+def receipt(shopping_cart, products):
     #checks whether or not the cart is empty or not, if it's not empty, then the program will go into this body
-    if len(cart) != 0:
+    if len(shopping_cart) != 0:
         print("========== RECEIPT ==========")
 
         #gets the current local date
@@ -148,18 +168,21 @@ def receipt(subtotal, cart):
         formatted_now = now.strftime("%m/%d/%Y").replace("/0", "/")
         print("Date:", formatted_now) 
 
-        #lists all of the shopping carts' producst and their items
-        for itm in range(len(cart)):
-            print(f"{itm+1}.", cart[itm], "     ", f"${prices[products.index(cart[itm])]:.2f}")
+        #lists all of the shopping carts' products and their items
+        display_cart(shopping_cart,products)
 
         #prints the subtotal
+        subtotal = calculate_subtotal(shopping_cart, products)
         print("Subtotal:", f"${subtotal:.2f}")
-
+        
         #calls the discount function
         discount = get_discount(subtotal)
 
-        #this calculates the amount of money saved
-        saved = discount * subtotal
+        if discount != 0:
+            #this calculates the amount of money saved
+            saved = discount * subtotal
+        else:
+            saved = 0
         #this calculates the final amount after the discount was applied
         final = subtotal - saved
         print("Discount: ", f"{discount:.0%}")
@@ -193,7 +216,7 @@ while checkout == False:
     print("6. Checkout")
     print()
     #Asks the user to input their choice based off the menu
-    choice = int(input("Enter your choice: "))
+    choice = int(input("Enter your choice:"))
  
     #Checks if the user chose option 1
     if choice == 1:
@@ -209,23 +232,22 @@ while checkout == False:
         
     #Checks if the user chose option 4
     elif choice == 4:
-        display_cart(shopping_cart)
+        display_cart(shopping_cart, products)
 
     #Checks if the user chose option 5
     elif choice == 5:
-        print("========== CURRENT TOTAL ==========")
+        print("========== SUBTOTAL ==========")
         #this will get the subtotal from the function "calculate_total"
-        subtotal = calculate_total(shopping_cart,products)
+        subtotal = calculate_subtotal(shopping_cart, products)
         print("Subtotal:", f"${subtotal:.2f}")
 
     #checks if the user chose option 6
     elif choice == 6:
         #this will get the subtotal from the function "calculate_total"
-        subtotal = calculate_total(shopping_cart, products)
+        calculate_subtotal(shopping_cart, products)
         #this will get the checkout from the "receipt" function
-        checkout = receipt(subtotal, shopping_cart, products)
+        checkout = receipt(shopping_cart, products)
         
-
     #This function runs when the user chooses a number that's out of the range of 1 and 6 inclusive
     else:
         print("Invalid option!")
