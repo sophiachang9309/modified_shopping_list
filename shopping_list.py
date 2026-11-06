@@ -1,13 +1,15 @@
 #Name: Sophia Chang
 #Class: AM
 
+from datetime import datetime
+
 #dictionary called products, which has prodcuts and their prices
 products = {
     "Cookies" : 4.0,
-    "Milk" : 4.0,
-    "Pumpkin pie": 10.0,
-    "Hot chocolate" : 3.0,
-    "Mint candy" : 2.0
+    "Custard" : 4.0,
+    "Cupcake": 10.0,
+    "Macaron" : 3.0,
+    "Strudel" : 2.0
 }
 
 #dictionary called shopping_list, which has products and the quantity of each
@@ -25,7 +27,7 @@ def display_products(prod):
 def add_product(shopping_cart, products):
     print("Products")
     #iterates through the dictionary to be able to print every single key 
-    for i, (product) in enumerate(products.items(),1):
+    for i, (product) in enumerate(products.keys(),1):
         print(f"{i}. {product}")
 
     #allows the user to choose which product they'd like to add to their shopping_cart
@@ -67,12 +69,26 @@ def remove_product(shopping_cart):
     #this functions when there is actually something in the shopping_cart
     if len(shopping_cart) != 0:
         remove = int(input("What item would you like to delete?(choose a number)"))
-        print(f"Removed 1 {new[remove-1]} from your cart!")
+        #checks if the user's number to remove is in the right range
+        while remove < 1 or remove > len(shopping_cart):
+            print("Invalid number")
+            remove = int(input("What item would you like to delete?(choose a number)"))
         #the list(shopping_cart)[remove - 1] part gets you the key, but the overall function of this is to get subtract one from the quantity
         new = shopping_cart[list(shopping_cart)[remove - 1]] - 1
+
+        #this removes the key form the shopping cart
+        print(f"Removed 1 {list(shopping_cart)[remove-1]} from your cart!")
+
         #this sets the key to the new value 
         shopping_cart[list(shopping_cart)[remove - 1]] = new
-        print(f"{list(shopping_cart)[remove-1]} quantity is now {new}")
+
+        #checks whether or not the quantity reached 0, completely removes it from the cart
+        if shopping_cart[list(shopping_cart)[remove - 1]] <= 0:
+            del shopping_cart[list(shopping_cart)[remove - 1]]
+            print(f"{list(shopping_cart)[remove - 1]} has been completely removed from your cart.")
+        #this starts when the quantity isn't 0 or less
+        else:
+            print(f"{list(shopping_cart)[remove - 1]} is now {shopping_cart[list(shopping_cart)[remove - 1]]} ")
     #this functions when there is nothing in the shopping cart
     else:
         print("There's nothing in your shopping cart to remove.")
@@ -88,6 +104,7 @@ def display_cart(shopping_cart):
     #functions when the shopping_cart list isn't empty. in other words, it works when the cart is not empty
     else:
         #displays everything currently in the shopping cart
+        print(f"")
         for i, (product, quantity) in enumerate(shopping_cart.items(),1):
             #sees whether or not the key from shopping_list is in the products' dictionary
             if list(shopping_cart)[i-1] in products:
@@ -97,7 +114,7 @@ def display_cart(shopping_cart):
                 print(f"{i}. {product}     {unit_price}     {shopping_cart[list(shopping_cart)[i - 1]]}    ${unit_price *  shopping_cart[list(shopping_cart)[i - 1]]:.2f}")
 
 #Option 5
-def calculate_total(cart):
+def calculate_total(cart, products):
     sub = 0
     #finds the subtotal by adding up all of the prices of the products
     for itm in range(len(cart)):
@@ -194,21 +211,21 @@ while checkout == False:
     elif choice == 4:
         display_cart(shopping_cart)
 
-    # #Checks if the user chose option 5
-    # elif choice == 5:
-    #     print("========== CURRENT TOTAL ==========")
-    #     #this will get the subtotal from the function "calculate_total"
-    #     subtotal = calculate_total(shopping_cart)
-    #     print("Subtotal:", f"${subtotal:.2f}")
+    #Checks if the user chose option 5
+    elif choice == 5:
+        print("========== CURRENT TOTAL ==========")
+        #this will get the subtotal from the function "calculate_total"
+        subtotal = calculate_total(shopping_cart,products)
+        print("Subtotal:", f"${subtotal:.2f}")
 
-    # #checks if the user chose option 6
-    # elif choice == 6:
-    #     #this will get the subtotal from the function "calculate_total"
-    #     subtotal = calculate_total(shopping_cart)
-    #     #this will get the checkout from the "receipt" function
-    #     checkout = receipt(subtotal, shopping_cart)
+    #checks if the user chose option 6
+    elif choice == 6:
+        #this will get the subtotal from the function "calculate_total"
+        subtotal = calculate_total(shopping_cart, products)
+        #this will get the checkout from the "receipt" function
+        checkout = receipt(subtotal, shopping_cart, products)
         
 
-    # #This function runs when the user chooses a number that's out of the range of 1 and 6 inclusive
-    # else:
-    #     print("Invalid option!")
+    #This function runs when the user chooses a number that's out of the range of 1 and 6 inclusive
+    else:
+        print("Invalid option!")
